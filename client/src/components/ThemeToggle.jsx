@@ -31,7 +31,7 @@ export default function ThemeToggle(){//CREATING A REACT COMPONENT
     },[dark]);//Triggered when you mount using dark theme
 
     return(
-        <Button variant="ghost" size="icon" aria-label="toggle theme" onClick={()=>setDark(!dark)}>
+        <Button className="cursor-pointer" variant="ghost" size="icon" aria-label="toggle theme" onClick={()=>setDark(!dark)}>
             {dark ? <SunIcon className="h-5 w-5"/>:<MoonIcon className="h-5 w-5"/>}
         </Button>
     )
