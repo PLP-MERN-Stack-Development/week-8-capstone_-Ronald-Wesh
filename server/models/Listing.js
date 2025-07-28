@@ -23,16 +23,18 @@ const ListingSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  price: {
+    type: Number,
+    required: [true, "Price is required"],
+    min: [0, "Price must be a positive number"],
+  },
   images: [
     {
       type: String
     }
   ],
-  createdAt: {
-    type: Date,
-    default: Date.now
-  }
-});
+  
+},{timestamps:true});
 
 const Listing=mongoose.model('Listing',ListingSchema);
 module.exports=Listing;
