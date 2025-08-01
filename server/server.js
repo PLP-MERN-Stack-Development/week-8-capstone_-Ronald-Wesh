@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const connectDB = require('./config/db');
+const connectDb= require('./config/db');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 
@@ -16,23 +16,22 @@ app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
 
 // Connect to MongoDB
-//connectDB();
+//connectDb();
 
 //Import Routes
-const authRoutes = require('./routes/authRoutes');
-//app.use('/api/auth', authRoutes); // ⬅️ VERY IMPORTANT
-
-
 const listingRoutes = require('./routes/listingRoutes');
 const forumRoutes = require('./routes/forumRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
+const verificationRoutes = require('./routes/verificationRoutes');
+const authRoutes = require('./routes/authRoutes');
+
 
 //Use Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/listings', listingRoutes);
 app.use('/api/forum', forumRoutes);
 app.use('/api/reviews', reviewRoutes);
-
+app.use('/api/verification', verificationRoutes);
 
 // Root Route
 app.get('/', (req, res) => {
@@ -49,7 +48,10 @@ app.use((err, req, res, next) => {
 
 // Connect to MongoDB
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect(process.env.MONGO_URI,{
+    useUnifiedToplogy:true,
+    useNewUrlParser:true,
+  })
   .then(() => {
     console.log('Connected to MongoDB');
     // Start server

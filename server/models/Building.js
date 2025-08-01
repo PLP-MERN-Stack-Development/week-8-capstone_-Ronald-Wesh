@@ -14,12 +14,12 @@ const buildingSchema = new mongoose.Schema(
       trim: true,
     },
 
-    campus_proximity: {
-      type: String,
-      required: false,
-      trim: true,
-      // Example: "Near Kenyatta University"
-    },
+    // campus_proximity: {
+    //   type: String,
+    //   required: false,
+    //   trim: true,
+    //   // Example: "Near Kenyatta University"
+    // },
 
     average_rating: {
       type: Number,
@@ -37,10 +37,7 @@ const buildingSchema = new mongoose.Schema(
         enum: ["Point"],
         default: "Point",
       },
-      coordinates: {
-        type: [Number], // [lng, lat]
-        default: [0, 0],
-      },
+      
     },
   },
   {

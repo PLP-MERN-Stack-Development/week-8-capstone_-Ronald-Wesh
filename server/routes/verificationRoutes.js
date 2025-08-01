@@ -1,10 +1,18 @@
+//Used by admin/verifier to view requests & verify landlords
 const express = require('express');
 const router = express.Router();
 const verificationController = require('../controllers/verificationController');
-const { protect, admin } = require('../middleware/authMiddleware');
+const { protect} = require('../middleware/authMiddleware');
+const verifier=require("../middleware/verifier")
 
-router.get('/pending', protect, admin, verificationController.getPendingVerifications);
-router.post('/:id/approve', protect, admin, verificationController.approveVerification);
-router.post('/:id/reject', protect, admin, verificationController.rejectVerification);
+// router.get('/pending', protect,  verificationController.getPendingVerifications);
+// router.post('/:id/approve', protect,  verificationController.approveVerification);
+// router.post('/:id/reject', protect, verificationController.rejectVerification);
+
+// Route: Submit verification (Admin verifies a user)
+router.put("/:id",protect,verifier,verificationController.submitVerification);
+
+// Route: Get all verification requests (Only admins can view)
+router.get("/",protect,verifier,verificationController.getAllRequests);
 
 module.exports = router;

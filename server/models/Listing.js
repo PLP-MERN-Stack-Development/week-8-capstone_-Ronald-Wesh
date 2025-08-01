@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { default: Building } = require('./Building');
 
 const ListingSchema = new mongoose.Schema({
   title: {
@@ -14,14 +15,18 @@ const ListingSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  landlord: {
+  Building: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'Building',
     required: true
   },
-  verified: {
+  isVerified: {
     type: Boolean,
     default: false
+  },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
   },
   price: {
     type: Number,
@@ -36,5 +41,4 @@ const ListingSchema = new mongoose.Schema({
   
 },{timestamps:true});
 
-const Listing=mongoose.model('Listing',ListingSchema);
-module.exports=Listing;
+module.exports=mongoose.model("Listing",ListingSchema);

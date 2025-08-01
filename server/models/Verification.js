@@ -11,7 +11,7 @@ const verificationSchema = new mongoose.Schema(
 
     Verifier: {
       type:mongoose.Schema.Types.ObjectId,
-      ref:"User",
+      ref:"User",//Admin
       required: true,
     },
 

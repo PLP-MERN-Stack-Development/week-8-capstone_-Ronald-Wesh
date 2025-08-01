@@ -28,7 +28,14 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ['tenant', 'landlord', 'admin'],
         default: 'tenant'
-    }
+    },
+    isVerified: { type: Boolean,
+         default: false }, // For landlord verification
+    verification_status: {
+     type: String,
+        enum: ['unverified', 'pending', 'verified'],
+        default: 'unverified',
+          },
 }, { 
     timestamps: true  // This adds createdAt and updatedAt automatically
 });
@@ -53,5 +60,4 @@ userSchema.methods.comparePassword = async function(password) {
     return await bcrypt.compare(password, this.password);
 };
 
-const User = mongoose.model('User', userSchema);
-module.exports = User;
+module.exports=mongoose.model("User",userSchema);
