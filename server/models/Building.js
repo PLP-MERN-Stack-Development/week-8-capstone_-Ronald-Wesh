@@ -1,4 +1,4 @@
-const mongoose=require("mongoose");
+const { default: mongoose } = require("mongoose");
 
 const buildingSchema = new mongoose.Schema(
   {
@@ -11,6 +11,23 @@ const buildingSchema = new mongoose.Schema(
     address: {
       type: String,
       required: [true, "Building address is required"],
+      trim: true,
+    },
+    location: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        default: "Point",
+        required: true,
+      },
+      coordinates: {
+        type: [Number],
+        // required: true,
+      },
+    },
+    description: {
+      type: String,
+      default: "No description provided.",
       trim: true,
     },
 
@@ -31,14 +48,7 @@ const buildingSchema = new mongoose.Schema(
       default: 0,
     },
 
-    location: {
-      type: {
-        type: String,
-        enum: ["Point"],
-        default: "Point",
-      },
-      
-    },
+  
   },
   {
     timestamps: true,
@@ -48,4 +58,4 @@ const buildingSchema = new mongoose.Schema(
 // Optional: Enable spatial search for buildings
 buildingSchema.index({ location: "2dsphere" });
 
-export default mongoose.model("Building", buildingSchema);
+module.exports=mongoose.model("Building", buildingSchema);

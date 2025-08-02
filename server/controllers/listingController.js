@@ -14,13 +14,14 @@ exports.createListing = async (req, res) => {
     user.verified && 
     user.verification_status === "verified";
 
-    const { title, description, price, address ,createdBy} = req.body;
+    const { title, description, price, building,address ,createdBy} = req.body;
     const newListing = new Listing({
       // ...req.body,
       // landlord: req.user.id // assuming auth middleware sets req.user
       title,
       description,
       price,
+      building,
       address,
       createdBy:req.user._id,
       verifiedListing:isVerifiedLandlord ? true : false, // add badge flag

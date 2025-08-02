@@ -2,32 +2,30 @@ const mongoose=require("mongoose");
 
 const verificationSchema = new mongoose.Schema(
   {
-    Landlord: {
+    landlord: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
       unique: true, // Each user can only have one active verification
     },
-
-    Verifier: {
-      type:mongoose.Schema.Types.ObjectId,
-      ref:"User",//Admin
-      required: true,
+    requestMessage: {
+      type: String,
+      trim: true,
+      maxlength: 300,
+      default: "", // Optional note from landlord (why they want to be verified)
     },
-
     status: {
       type: String,
       enum: ["pending", "verified", "rejected"],
       default: "pending",
     },
-
-    reason: {
-      type: String,
-      trim: true,
-      maxlength: 300,
+    reviwedBy: {
+      type:mongoose.Schema.Types.ObjectId,
+      ref:"User",//Admin
+      required: true,
     },
     notes: String // Rejection reasons
 },{timestamps:true});
 
 
-module.exports=mongoosse.model("Verification",verificationSchema);
+module.exports=mongoose.model("Verification",verificationSchema);

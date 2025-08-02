@@ -15,7 +15,7 @@ const ReviewSchema = new mongoose.Schema({
       landlord: { type: Number, min: 1, max: 5 }
     },
     isAnonymous:{type:Boolean,default:true},
-    comment: String
+    comment: {type:String,required:true}
 },{timestamps:true});
 
 module.exports = mongoose.model('Review', ReviewSchema);

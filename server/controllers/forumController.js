@@ -5,8 +5,13 @@ exports.createPost = async (req, res) => {
   try {
     const post = new ForumPost({
       building: req.params.buildingId,
-      user: req.user._id,
-      content: req.body.content,
+      post:req.body.post,
+      // posts: [{
+      //   user: req.user._id,
+      //   content: req.body.content,
+      //   isAnonymous: req.body.isAnonymous||true,
+      //   resolved: req.body.resolved ||false,
+      // }]
     });
     const saved = await post.save();
     res.status(201).json(saved);

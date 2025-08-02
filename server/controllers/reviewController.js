@@ -6,10 +6,10 @@ exports.createReview = async (req, res) => {
 
     const review = new Review({
       building: req.params.buildingId,
-      user: req.user._id,
-      safety: req.body.safety,
-      water: req.body.water,
-      landlordReliability: req.body.landlordReliability
+      reviewer: req.user._id,
+      ratings:req.body.ratings,
+      isAnonymous:req.body.isAnonymous||true,
+      comment:req.body.comment
     });
     const saved = await review.save();
     res.status(201).json(saved);

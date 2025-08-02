@@ -1,16 +1,20 @@
-require('dotenv').config();
+
+const dotenv=require('dotenv');
 const express = require('express');
 const cors = require('cors');
 const connectDb= require('./config/db');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
-
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
 app.use(express.json());
 app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: true }));
@@ -24,14 +28,16 @@ const forumRoutes = require('./routes/forumRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const verificationRoutes = require('./routes/verificationRoutes');
 const authRoutes = require('./routes/authRoutes');
+const buildingRoutes = require('./routes/buildingRoutes');
 
 
 //Use Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/listings', listingRoutes);
-app.use('/api/forum', forumRoutes);
+app.use('/api/forums', forumRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/verification', verificationRoutes);
+app.use('/api/buildings', buildingRoutes);
 
 // Root Route
 app.get('/', (req, res) => {
@@ -49,11 +55,11 @@ app.use((err, req, res, next) => {
 // Connect to MongoDB
 mongoose
   .connect(process.env.MONGO_URI,{
-    useUnifiedToplogy:true,
-    useNewUrlParser:true,
+    // useUnifiedToplogy:true,
+    // useNewUrlParser:true,
   })
   .then(() => {
-    console.log('Connected to MongoDB');
+    console.log('Connected to MongoDB Successfully');
     // Start server
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);

@@ -15,10 +15,16 @@ const ListingSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  Building: {
+  building: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Building',
+    type: String,
     required: true
+  },
+  price: {
+    type: Number,
+    required: [true, "Price is required"],
+    min: [0, "Price must be a positive number"],
   },
   isVerified: {
     type: Boolean,
@@ -28,11 +34,7 @@ const ListingSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
   },
-  price: {
-    type: Number,
-    required: [true, "Price is required"],
-    min: [0, "Price must be a positive number"],
-  },
+
   images: [
     {
       type: String

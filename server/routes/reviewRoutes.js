@@ -11,11 +11,11 @@ router.get('/building/:buildingId', reviewController.getReviews);
 
 
 // Create a new review (protected)
-router.post('/:', protect, reviewController.createReview);
+// router.post('/', protect, reviewController.createReview);
 
 // Create a review for a specific building (requires login)
-router.post('/building/:buildingId', protect, reviewController.createReview);
-
+router.post('/:buildingId', protect, reviewController.createReview);
+//building/:buildingId
 // Get all reviews by a specific user
 router.get('/user/:userId', reviewController.getUserReviews);
 
