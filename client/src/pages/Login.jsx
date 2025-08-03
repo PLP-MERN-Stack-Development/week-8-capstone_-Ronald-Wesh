@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { LockClosedIcon as Lock, EyeIcon as Eye, EyeSlashIcon as EyeOff, EnvelopeIcon as Mail } from '@heroicons/react/24/outline'
-// import { EnvelopeIcon as Mail } from '@heroicons/react/24/outline'; // Added Mail icon
 import {Button} from "../components/ui/button"
 import { useNavigate } from "react-router-dom";
 import { useAuth } from '@/context/AuthContext';
+import {Home} from "lucide-react"; 
 
 const Login = () => {
   // State Management
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ email: '', password: '' });
   const [submitting, setSubmitting] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const { login, isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
 
@@ -19,26 +19,33 @@ const Login = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+    // Clear error when user starts typing
+    if (error) setError('');
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
-    // Add your login logic here
-    setTimeout(() => {
+    setError('');
+
+    try {
+      // Call the login function from AuthContext
+      await login(form.email, form.password);
+      // If login is successful, the useEffect below will handle navigation
+    } catch (err) {
+      // Handle login errors
+      setError(err.message || 'Login failed. Please check your credentials.');
+      console.error('Login error:', err);
+    } finally {
       setSubmitting(false);
-    }, 2000);
+    }
   };
-
-  // Effect for loading initialization
-  useEffect(() => {
-    // Add any loading setup if needed
-  }, []);
-
+  //*********** */
+  // Redirect to dashboard if already authenticated
   useEffect(() => {
     if (isAuthenticated && user) {
-      navigate("/dashboard", { replace: true });
+      navigate("/listings", { replace: true });
     }
   }, [isAuthenticated, user, navigate]);
 
@@ -53,7 +60,7 @@ const Login = () => {
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl mb-4 shadow-lg">
               <div className="w-8 h-8 text-white">
-                {/* Icon or content here */}
+              <Home className="w-8 h-8 text-white" />
               </div>
             </div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
@@ -65,6 +72,13 @@ const Login = () => {
           <div className="Login Form">
             <div className="backdrop-blur-xl bg-white/10 dark:bg-white/5 border border-white/20 rounded-2xl p-8 shadow-2xl">
               <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Error Message */}
+                {error && (
+                  <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+                    <p className="text-red-400 text-sm text-center">{error}</p>
+                  </div>
+                )}
+
                 {/* Email Field */}
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-slate-200">Email Address</label>
@@ -75,7 +89,7 @@ const Login = () => {
                       name="email"
                       value={form.email}
                       onChange={handleChange}
-                      className="w-full pl-10 pr-4 py-2 bg-transparent border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
                       placeholder="you@example.com"
                       required
                     />
@@ -101,7 +115,7 @@ const Login = () => {
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 hover:text-slate-300 transition-colors"
                     >
-                      {showPassword ? <EyeOff /> : <Eye />}
+                      {showPassword ? <Eye/> : <EyeOff/>}
                     </button>
                   </div>
                 </div>
@@ -109,10 +123,10 @@ const Login = () => {
                 {/* Submit Button */}
                 <Button
                   type="submit"
-                  disabled={submitting || loading || !form.email || !form.password}
-                  className="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-medium rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={submitting || !form.email || !form.password}
+                  className="cursor-pointer w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-medium rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {submitting || loading ? (
+                  {submitting ? (
                     <div className="flex items-center justify-center space-x-2">
                       <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                       <span>Signing in...</span>

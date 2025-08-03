@@ -1,17 +1,112 @@
 // // used to manage login, registration, user session, and authorization state globally in your frontend app.
-// // t creates a global Auth context that:
-
+// //  creates a global Auth context that:
 // // Checks if a user is already logged in when the app starts
-
-// // Logs in a user and stores token + user info
-
+// //  Logs in a user and stores token + user info
 // // Registers a user
-
 // // Logs out a user
-
 // // Shares the auth state (user, isAdmin, isAuthenticated, etc.) with the rest of your app
 
+// // Manages login/register/logout + persists user session
+// //Connected to: authAPI (API requests), localStorage, AuthContext
+// //Why it's essential: Gives every component access to user data (like role, token)
+// import React, { createContext, useContext, useState, useEffect } from 'react';
+// import { authAPI } from '../utils/api';
+// import toast from 'react-hot-toast';
 
+// export const AuthContext = createContext();
+
+// export const useAuth = () => {
+//   const context = useContext(AuthContext);
+//   if (!context) {
+//     throw new Error('useAuth must be used within an AuthProvider');
+//   }
+//   return context;
+// };
+
+// export const AuthProvider = ({ children }) => {
+//   const [user, setUser] = useState(null);
+//   const [loading, setLoading] = useState(true);
+
+//   // Check authentication status on app start
+//   useEffect(() => {
+//     // Check if user is logged in on app start
+//     const token = localStorage.getItem('token');
+//     const userData = localStorage.getItem('user');
+    
+//     if (token && userData) {
+//       setUser(JSON.parse(userData));
+//       // Verify token is still valid
+//       authAPI.getMe()
+//         .then(response => {
+//           setUser(response.data);
+//           localStorage.setItem('user', JSON.stringify(response.data));
+//         })
+//         .catch(() => {
+//           localStorage.removeItem('token');
+//           localStorage.removeItem('user');
+//           setUser(null);
+//         })
+//         .finally(() => setLoading(false));
+//     } else {
+//       setLoading(false);
+//     }
+//   }, []);
+
+//   const login = async (email, password) => {
+//     try {
+//       const response = await authAPI.login({ email, password });
+//       const { token, ...userData } = response.data;
+      
+//       localStorage.setItem('token', token);
+//       localStorage.setItem('user', JSON.stringify(userData));
+//       setUser(userData);
+      
+//       toast.success('Logged in successfully');
+//       return { success: true };
+//     } catch (error) {
+//       const message = error.response?.data?.message || 'Login failed';
+//       toast.error(message);
+//       return { success: false, message };
+//     }
+//   };
+
+//   const register = async (userData) => {
+//     try {
+//       const response = await authAPI.register(userData);
+//       const { token, ...newUserData } = response.data;
+      
+//       localStorage.setItem('token', token);
+//       localStorage.setItem('user', JSON.stringify(newUserData));
+//       setUser(newUserData);
+      
+//       toast.success('Account created successfully');
+//       return { success: true };
+//     } catch (error) {
+//       const message = error.response?.data?.message || 'Registration failed';
+//       toast.error(message);
+//       return { success: false, message };
+//     }
+//   };
+
+//   const logout = () => {
+//     localStorage.removeItem('token');
+//     localStorage.removeItem('user');
+//     setUser(null);
+//     toast.success('Logged out successfully');
+//   };
+
+//   const value = {
+//     user,
+//     login,
+//     register,
+//     logout,
+//     loading,
+//     isAuthenticated: !!user,
+//     isAdmin: user?.role === 'admin',
+//   };
+
+//   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+// }; 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { authAPI } from '../utils/api';
 import toast from 'react-hot-toast';
@@ -30,63 +125,92 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Check authentication status on app start
   useEffect(() => {
-    // Check if user is logged in on app start
-    const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
-    
-    if (token && userData) {
-      setUser(JSON.parse(userData));
-      // Verify token is still valid
-      authAPI.getMe()
-        .then(response => {
-          setUser(response.data);
-          localStorage.setItem('user', JSON.stringify(response.data));
-        })
-        .catch(() => {
+    const initializeAuth = async () => {
+      const token = localStorage.getItem('token');
+      const userData = localStorage.getItem('user');
+      
+      if (token && userData) {
+        try {
+          // Parse stored user data
+          const parsedUser = JSON.parse(userData);
+          setUser(parsedUser);
+          
+          // Verify token is still valid by calling backend
+          const response = await authAPI.getMe();
+          const currentUser = response.data;
+          
+          // Update user data with latest from backend
+          setUser(currentUser);
+          localStorage.setItem('user', JSON.stringify(currentUser));
+        } catch (error) {
+          console.error('Token verification failed:', error);
+          // Token is invalid, clear storage
           localStorage.removeItem('token');
           localStorage.removeItem('user');
           setUser(null);
-        })
-        .finally(() => setLoading(false));
-    } else {
+        }
+      }
       setLoading(false);
-    }
+    };
+
+    initializeAuth();
   }, []);
 
   const login = async (email, password) => {
     try {
+      setLoading(true);
       const response = await authAPI.login({ email, password });
-      const { token, ...userData } = response.data;
       
+      // Backend should return: { token, user: { id, name, email, role, ... } }
+      const { token, user: userData, ...otherData } = response.data;
+      
+      // Handle different response structures
+      const finalUserData = userData || { ...otherData };
+      
+      // Store token and user data
       localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(userData));
-      setUser(userData);
+      localStorage.setItem('user', JSON.stringify(finalUserData));
+      setUser(finalUserData);
       
-      toast.success('Logged in successfully');
-      return { success: true };
+      toast.success(`Welcome back, ${finalUserData.name || finalUserData.email}!`);
+      return { success: true, user: finalUserData };
     } catch (error) {
-      const message = error.response?.data?.message || 'Login failed';
+      console.error('Login error:', error);
+      const message = error.response?.data?.message || 'Login failed. Please try again.';
       toast.error(message);
-      return { success: false, message };
+      throw new Error(message);
+    } finally {
+      setLoading(false);
     }
   };
 
   const register = async (userData) => {
     try {
+      setLoading(true);
       const response = await authAPI.register(userData);
-      const { token, ...newUserData } = response.data;
       
+      // Backend should return: { token, user: { id, name, email, role, ... } }
+      const { token, user: newUserData, ...otherData } = response.data;
+      
+      // Handle different response structures
+      const finalUserData = newUserData || { ...otherData };
+      
+      // Store token and user data
       localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(newUserData));
-      setUser(newUserData);
+      localStorage.setItem('user', JSON.stringify(finalUserData));
+      setUser(finalUserData);
       
-      toast.success('Account created successfully');
-      return { success: true };
+      toast.success(`Welcome to Boma, ${finalUserData.name || finalUserData.email}!`);
+      return { success: true, user: finalUserData };
     } catch (error) {
-      const message = error.response?.data?.message || 'Registration failed';
+      console.error('Registration error:', error);
+      const message = error.response?.data?.message || 'Registration failed. Please try again.';
       toast.error(message);
-      return { success: false, message };
+      throw new Error(message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -97,44 +221,39 @@ export const AuthProvider = ({ children }) => {
     toast.success('Logged out successfully');
   };
 
+  const updateUser = (updatedUserData) => {
+    const newUserData = { ...user, ...updatedUserData };
+    setUser(newUserData);
+    localStorage.setItem('user', JSON.stringify(newUserData));
+  };
+
+  // Helper functions for role checking
+  const isAuthenticated = !!user;
+  const isAdmin = user?.role === 'admin';
+  const isLandlord = user?.role === 'landlord';
+  const isTenant = user?.role === 'tenant';
+
   const value = {
+    // State
     user,
+    loading,
+    isAuthenticated,
+    
+    // Role checks
+    isAdmin,
+    isLandlord,
+    isTenant,
+    
+    // Actions
     login,
     register,
     logout,
-    loading,
-    isAuthenticated: !!user,
-    isAdmin: user?.role === 'admin',
+    updateUser,
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}; 
-// import { Link } from "react-router-dom";
-// import { Button } from "../components/ui/button.jsx";
-// // import { useAuth } from "./AuthContext.jsx";
-
-// export default function Navbar() {
-//   const { user, logout } = useAuth();
-
-//   return (
-//     <nav className="sticky top-0 z-50 border-b border-zinc-200 px-4 py-2 flex items-center justify-between bg-white">
-//       <Link to="/dashboard" className="font-bold text-lg">Boma</Link>
-//       <div className="flex items-center gap-2">
-//         {user?.role && (
-//           <span className={`px-2 py-1 rounded text-xs font-medium ${
-//             user.role === 'admin'
-//               ? 'bg-blue-100 text-blue-800'
-//               : 'bg-green-100 text-green-800'
-//           }`}>
-//             {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
-//           </span>
-//         )}
-//         {user && (
-//           <Button variant="outline" onClick={logout}>
-//             Logout
-//           </Button>
-//         )}
-//       </div>
-//     </nav>
-//   );
-// }
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
+};

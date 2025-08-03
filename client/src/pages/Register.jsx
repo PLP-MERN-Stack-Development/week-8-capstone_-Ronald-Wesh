@@ -32,7 +32,7 @@ const Register = () => {
     setSubmitting(false);
     
     if (res.success) {
-      navigate('/dashboard');
+      navigate('/listings');
     }
   };
 
@@ -40,21 +40,21 @@ const Register = () => {
     {
       value: 'tenant',
       label: 'Tenant',
-      description: 'Looking for a place to rent',
+      description: 'Looking For A Place To Rent',
       icon: User,
       color: 'from-blue-500 to-cyan-500'
     },
     {
       value: 'landlord',
       label: 'Landlord',
-      description: 'I have properties to rent',
+      description: 'I Have Properties To Rent',
       icon: UserCheck,
       color: 'from-green-500 to-emerald-500'
     },
     {
       value: 'admin',
       label: 'Admin',
-      description: 'Platform administrator',
+      description: 'Platform Administrator',
       icon: Shield,
       color: 'from-red-500 to-pink-500'
     }
@@ -91,7 +91,7 @@ const Register = () => {
                   value={form.username}
                   onChange={handleChange}
                   className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                  placeholder="Choose a username"
+                  placeholder="Choose a Username"
                   required
                 />
               </div>
@@ -108,7 +108,7 @@ const Register = () => {
                   value={form.email}
                   onChange={handleChange}
                   className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                  placeholder="Enter your email"
+                  placeholder="Enter your Email"
                   required
                 />
               </div>
@@ -125,7 +125,7 @@ const Register = () => {
                   value={form.password}
                   onChange={handleChange}
                   className="w-full pl-10 pr-12 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                  placeholder="Create a password"
+                  placeholder="Create a Password"
                   required
                   minLength={6}
                 />
@@ -134,7 +134,7 @@ const Register = () => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400 hover:text-slate-300 transition-colors"
                 >
-                  {showPassword ? <EyeOff /> : <Eye />}
+                  {showPassword ? <Eye /> : <EyeOff />}
                 </button>
               </div>
               <p className="text-xs text-slate-400">Must be at least 6 characters</p>
@@ -142,7 +142,7 @@ const Register = () => {
 
             {/* Role Selection */}
             <div className="space-y-3">
-              <label className="text-sm font-medium text-slate-200">I am a...</label>
+              <label className="text-m font-medium text-slate-200">I Am a...</label>
               <div className="space-y-2">
                 {roleOptions.map((option) => {
                   const Icon = option.icon;

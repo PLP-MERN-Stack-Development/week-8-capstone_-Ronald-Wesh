@@ -6,8 +6,10 @@ import {useEffect} from 'react';
 import AdminDashboard from './pages/AdminDashboard.jsx';
 import LandlordDashboard from './pages/LandlordDashboard.jsx';
 import TenantDashboard from './pages/TenantDashboard.jsx';
+import Dashboard from './pages/Dashboard.jsx';
 import Navbar from './components/NavBar.jsx';
 import useAuth from './hooks/useAuth';
+//import Listings from './pages/Listings.jsx';
 
 import { Toaster } from 'react-hot-toast';
 
@@ -26,29 +28,6 @@ function ProtectedRoute({ children }) {
   
   return isAuthenticated ? children : <Navigate to="/login" replace />;
 }
-
-// export default function DashboardRouter() {
-//   const { user,isAuthenticated,loading } = useAuth();
-//   if (!user) return <Navigate to="/login" />;
-//   if (user.role === 'admin') return <AdminDashboard />;
-//   if (user.role === 'landlord') return <LandlordDashboard />;
-//   return <TenantDashboard />;
-// }
-function DashboardRouter() {
-  const { user, isAuthenticated, loading } = useAuth();
-
-  // Show loading screen if auth state is still loading
-  if (loading) return <div>Loading...</div>;
-
-  // Not authenticated? Redirect to login
-  if (!isAuthenticated || !user) return <Navigate to="/login" />;
-
-  // Authenticated: route to dashboard by role
-  if (user.role === "admin") return <AdminDashboard />;
-  if (user.role === "landlord") return <LandlordDashboard />;
-  return <TenantDashboard />;
-}
-
 
 export default function App() {
   const { isAuthenticated } = useAuth();
@@ -81,30 +60,52 @@ return (
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        {/* Root route - redirect to dashboard if authenticated, login if not */}
+        <Route
+          path="/"
+          element={
+            isAuthenticated 
+              ? <Navigate to="/dashboard" replace /> 
+              : <Navigate to="/login" replace />
+          }
+        />
 
-        {/* <Route
-        path="/"
-        element={<Navigate to="/dashboard" replace />}
-      /> */}
-<Route
-  path="/"
-  element={
-    isAuthenticated 
-      ? <Navigate to="/dashboard" replace /> 
-      : <Navigate to="/login" replace />
-  }
-/>
-
-
+      {/* General Dashboard - this is where users go after login/register */}
         <Route
           path="/dashboard"
           element={
             <ProtectedRoute>
-              <DashboardRouter/>
+              <Dashboard/>
             </ProtectedRoute>
           }
         />
-      
+              {/* Role-specific dashboards - users can navigate to these if needed */}
+              <Route
+          path="/admin-dashboard"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/landlord-dashboard"
+          element={
+            <ProtectedRoute>
+              <LandlordDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/tenant-dashboard"
+          element={
+            <ProtectedRoute>
+              <TenantDashboard />
+            </ProtectedRoute>
+          }
+        />
     
           {/* Redirect any unknown routes to dashboard for authenticated users */}
           <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />} />
