@@ -76,6 +76,14 @@ export const reviewsAPI = {
   delete: (reviewId) => API.delete(`/reviews/${reviewId}`),
 };
 
+// Saved Properties API endpoints
+export const savedPropertiesAPI = {
+  getAll: () => API.get('/saved-properties'),
+  add: (listingId) => API.post(`/saved-properties/${listingId}`),
+  remove: (listingId) => API.delete(`/saved-properties/${listingId}`),
+  check: (listingId) => API.get(`/saved-properties/${listingId}/check`),
+};
+
 // Verification API endpoints (Admin only)
 export const verificationAPI = {
   createVerificationRequest:()=>API.post("/verification"),

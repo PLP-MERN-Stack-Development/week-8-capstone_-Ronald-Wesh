@@ -19,16 +19,16 @@ import { UserCircle } from "lucide-react";
 export default function Navbar() {
   const { user, logout } = useAuth();
   const navLinks = [
-    { to: "/listings", label: "Listings" },
+   { to: "/listings", label: "Listings" },
     { to: "/reviews", label: "Reviews" },
-    { to: "/forum", label: "Forum" },
+    { to: "/forum", label: "Forums" },
     { to: "/dashboard", label: "Role-Dashboard", roles: ["tenant", "landlord", "admin"] },
     { to: "/admin", label: "Admin Panel", roles: ["admin"] },
   ];
   
 return (
   <nav className="glass sticky top-0 z-50 h-16 border-b border-zinc-200 dark:border-zinc-700 px-4 py-2 flex items-center justify-between bg-white/70 dark:bg-black/50 backdrop-blur-sm">
-    <Link to="/" className="font-bold text-lg text-primary">
+    <Link to="/" className="font-bold text-3xl text-primary">
       Boma
     </Link>
 

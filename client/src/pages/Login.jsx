@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom';
 import { LockClosedIcon as Lock, EyeIcon as Eye, EyeSlashIcon as EyeOff, EnvelopeIcon as Mail } from '@heroicons/react/24/outline'
 import {Button} from "../components/ui/button"
 import { useNavigate } from "react-router-dom";
-import { useAuth } from '@/context/AuthContext';
-import {Home} from "lucide-react"; 
+import useAuth  from '../hooks/useAuth'
+import {Home} from "lucide-react";
+import { clearAuthData, checkAuthData } from '../utils/debug'; 
 
 const Login = () => {
   // State Management
@@ -45,7 +46,7 @@ const Login = () => {
   // Redirect to dashboard if already authenticated
   useEffect(() => {
     if (isAuthenticated && user) {
-      navigate("/listings", { replace: true });
+      navigate("/dashboard", { replace: true });
     }
   }, [isAuthenticated, user, navigate]);
 
@@ -159,6 +160,33 @@ const Login = () => {
                   </Link>
                 </p>
               </div>
+
+              {/* Debug Section - Remove in production */}
+              {/* <div className="mt-4 pt-4 border-t border-white/10 text-center">
+                <p className="text-slate-400 text-xs mb-2">Debug Tools:</p>
+                <div className="flex gap-2 justify-center">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      checkAuthData();
+                      console.log('Current auth state:', { isAuthenticated, user });
+                    }}
+                    className="text-xs px-2 py-1 bg-blue-500/20 text-blue-300 rounded hover:bg-blue-500/30"
+                  >
+                    Check Auth
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      clearAuthData();
+                      window.location.reload();
+                    }}
+                    className="text-xs px-2 py-1 bg-red-500/20 text-red-300 rounded hover:bg-red-500/30"
+                  >
+                    Clear Auth
+                  </button>
+                </div>
+              </div> */}
             </div>
 
             {/* Footer */}

@@ -1,6 +1,5 @@
-// export default Register;
 import { useState } from 'react';
-import { useAuth } from '../context/AuthContext.jsx';
+import useAuth from '../hooks/useAuth'
 import { useNavigate, Navigate, Link } from 'react-router-dom';
 import { Button } from '../components/ui/button.jsx';
 import { Eye, EyeOff, Mail, Lock, User, Home, Shield, UserCheck, Users } from 'lucide-react';
@@ -15,12 +14,16 @@ const Register = () => {
   });
   const [submitting, setSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
+  // Redirect if already authenticated
   if (isAuthenticated) return <Navigate to="/dashboard" replace />;
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    // Clear error when user starts typing
+    if (error) setError('');
   };
 
   const handleSubmit = async (e) => {
@@ -28,11 +31,20 @@ const Register = () => {
     if (!form.username || !form.email || !form.password) return;
     
     setSubmitting(true);
-    const res = await register(form);
-    setSubmitting(false);
+    setError('');
     
-    if (res.success) {
-      navigate('/listings');
+    try {
+      const res = await register(form);
+      if (res.success) {
+        // Navigation will be handled by the auth state change in App.js
+        // But we can also explicitly navigate as a backup
+        navigate('/dashboard');
+      }
+    } catch (err) {
+      setError(err.message || 'Registration failed. Please try again.');
+      console.error('Registration error:', err);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -80,6 +92,13 @@ const Register = () => {
         {/* Register Form */}
         <div className="backdrop-blur-xl bg-white/10 dark:bg-white/5 border border-white/20 rounded-2xl p-8 shadow-2xl">
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Error Message */}
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+                <p className="text-red-400 text-sm text-center">{error}</p>
+              </div>
+            )}
+
             {/* Username Field */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-200">Username</label>
